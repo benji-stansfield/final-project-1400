@@ -1,0 +1,15 @@
+C:\Users\benji\code\my-code-dir\final-project-1400\bin\Debug\net8.0\final-project-1400.exe
+C:\Users\benji\code\my-code-dir\final-project-1400\bin\Debug\net8.0\final-project-1400.deps.json
+C:\Users\benji\code\my-code-dir\final-project-1400\bin\Debug\net8.0\final-project-1400.runtimeconfig.json
+C:\Users\benji\code\my-code-dir\final-project-1400\bin\Debug\net8.0\final-project-1400.dll
+C:\Users\benji\code\my-code-dir\final-project-1400\bin\Debug\net8.0\final-project-1400.pdb
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.AssemblyInfoInputs.cache
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.AssemblyInfo.cs
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.csproj.CoreCompileInputs.cache
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.sourcelink.json
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.dll
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\refint\final-project-1400.dll
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.pdb
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\final-project-1400.genruntimeconfig.cache
+C:\Users\benji\code\my-code-dir\final-project-1400\obj\Debug\net8.0\ref\final-project-1400.dll

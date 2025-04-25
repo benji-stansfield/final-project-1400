@@ -4,13 +4,23 @@ using System.Diagnostics;
 Console.Clear();
 
 /*Debug Tests*/
+
+//ValidateUsername tests
 Debug.Assert(ValidateUsername("benji stansfield") == false, "User shouldn't be allowed to use a space in username");
 Debug.Assert(ValidateUsername("14b") == false, "username should be over 4 characters");
 Debug.Assert(ValidateUsername("bms17") == true);
 Debug.Assert(ValidateUsername("bstansfield123456789") == true);
 
+//ValidatePin tests
+Debug.Assert(ValidatePin("23") == false, "Password should be 4 numbers");
+Debug.Assert(ValidatePin("1234") == true);
+Debug.Assert(ValidatePin("12345") == false, "Password should be 4 numbers");
+Debug.Assert(ValidatePin("g3*4") == false, "Pin cannot contain characters or letters");
+
+Console.Clear();
+
 int attempts = 3; //tracks login attempts
-string usernameInput; 
+string usernameInput;
 string pinInput;
 bool loggedIn = false; //used to log in a user
 bool userFound = false;
@@ -66,10 +76,12 @@ switch (userChoice)
                 continue;
             }
         }
+
         break;
+
     case 2:
 
-        Console.WriteLine("Please create a username (between 8-20 characters long, no spaces)");
+        Console.WriteLine("Please create a username (between 5-20 characters long, no spaces)");
 
         do
         {
@@ -80,6 +92,15 @@ switch (userChoice)
 
         } while(!usernameValidated);
 
+        do
+        {
+            Console.Write("Pin: ");
+            pinInput = Console.ReadLine();
+            if (ValidatePin(pinInput))
+                pinValidated = true;
+
+        } while(!pinValidated);
+
         break;
         
     default:
@@ -87,6 +108,7 @@ switch (userChoice)
         break;
 }
 
+/*Method makes sure the username input meets the qualifications*/
 static bool ValidateUsername(string input)
 {
     if (input.Length > 20)
@@ -94,7 +116,6 @@ static bool ValidateUsername(string input)
         Console.WriteLine("Username must be less than 20 characters.\n");
         return false;
     }
-
     else if (input.Length < 5)
     {
         Console.WriteLine("Username must be at least 5 characters.\n");
@@ -103,6 +124,31 @@ static bool ValidateUsername(string input)
     else if (input.Contains(' '))
     {
         Console.WriteLine("Username cannot contain spaces.\n");
+        return false;
+    }
+
+    //TODO: read users.txt to see if username already exists
+    
+    return true;
+}
+
+/*Method will validate the pin to fit in the parameters*/
+static bool ValidatePin(string input)
+{   
+    /*Checks to see if the pin input contains letters*/
+    try
+    {
+        int pinTry = Convert.ToInt32(input);
+    }
+    catch (FormatException)
+    {
+        Console.WriteLine("Pin must only contain numbers.\n");
+        return false;
+    }
+
+    if (input.Length != 4)
+    {
+        Console.WriteLine("Pin must be 4 characters long.\n");
         return false;
     }
     
