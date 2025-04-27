@@ -20,8 +20,8 @@ Debug.Assert(ValidatePin("g3*4") == false, "Pin cannot contain characters or let
 Console.Clear();
 
 int attempts = 3; //tracks login attempts
-string usernameInput;
-string pinInput;
+string usernameInput = "";
+string pinInput = "";
 bool loggedIn = false; //used to log in a user
 bool userFound = false;
 bool usernameValidated = false; //used to validate a username while creating account
@@ -31,17 +31,18 @@ Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
 ------------------------
 ");
-Console.WriteLine("Please select an option below");
 Console.WriteLine(@"1 - Sign In
 2 - Create Account");
+Console.Write("Please select an option: ");
 
 int userChoice = Convert.ToInt32(Console.ReadLine());
 
 Console.Clear();
 
+/*Code for the option to sign in or create an account*/
 switch (userChoice)
 {
-    case 1:
+    case 1: //choice for them to log in
 
         string[] lines = File.ReadAllLines("users.txt");
 
@@ -79,7 +80,7 @@ switch (userChoice)
 
         break;
 
-    case 2:
+    case 2: //choice for them to create account
 
         Console.WriteLine("Please create a username (between 5-20 characters long, no spaces)");
 
@@ -101,11 +102,53 @@ switch (userChoice)
 
         } while(!pinValidated);
 
+        File.AppendAllText("users.txt", $"\n{usernameInput},{pinInput}");
+
+        loggedIn = true;
+
         break;
         
     default:
         Console.WriteLine("Please select an option above.");
         break;
+}
+
+/*Inside the program-menu select*/
+while (loggedIn)
+{
+    if (File.Exists($"{usernameInput}.txt")) //only displays the menu if the user has a budget created
+    {
+        Console.WriteLine(@"
+    1 - View Current Budget
+    2 - Input Deposit
+    3 - Input Purchase
+    4 - Edit Budget
+    5 - Create New Budget
+    6 - Exit Program
+    ");
+        Console.WriteLine("What would you like to do?: ");
+        int menuSelection = Convert.ToInt32(Console.ReadLine());
+
+        /*Code for them to choose one of the options above*/
+        switch (menuSelection)
+        {
+            case 1:
+    
+                string[] lines = File.ReadAllLines($"{usernameInput}.txt");
+
+                foreach (string line in lines) //prints the contents of the file
+                {
+                    Console.WriteLine(line);
+                }
+
+                break;
+        }
+    }
+    /*TODO - create an else statement that automatically takes user to create a file if they haven't already
+    else
+    {
+
+    }*/
 }
 
 /*Method makes sure the username input meets the qualifications*/
