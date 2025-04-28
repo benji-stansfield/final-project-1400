@@ -26,6 +26,9 @@ bool loggedIn = false; //used to log in a user
 bool userFound = false;
 bool usernameValidated = false; //used to validate a username while creating account
 bool pinValidated = false; //used to validate a pin while creating account
+string categoryName = "";
+decimal categoryAllotment = 0;
+decimal spentInCategory = 0;
 
 Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
@@ -113,43 +116,6 @@ switch (userChoice)
         break;
 }
 
-/*Inside the program-menu select*/
-while (loggedIn)
-{
-    if (File.Exists($"{usernameInput}.txt")) //only displays the menu if the user has a budget created
-    {
-        Console.WriteLine(@"
-    1 - View Current Budget
-    2 - Input Deposit
-    3 - Input Purchase
-    4 - Edit Budget
-    5 - Create New Budget
-    6 - Exit Program
-    ");
-        Console.WriteLine("What would you like to do?: ");
-        int menuSelection = Convert.ToInt32(Console.ReadLine());
-
-        /*Code for them to choose one of the options above*/
-        switch (menuSelection)
-        {
-            case 1:
-    
-                string[] lines = File.ReadAllLines($"{usernameInput}.txt");
-
-                foreach (string line in lines) //prints the contents of the file
-                {
-                    Console.WriteLine(line);
-                }
-
-                break;
-        }
-    }
-    /*TODO - create an else statement that automatically takes user to create a file if they haven't already
-    else
-    {
-
-    }*/
-}
 
 /*Method makes sure the username input meets the qualifications*/
 static bool ValidateUsername(string input)
@@ -198,3 +164,98 @@ static bool ValidatePin(string input)
     return true;
 }
 
+
+/*Inside the program-menu select*/
+while (loggedIn)
+{
+    if (File.Exists($"{usernameInput}.txt")) //only displays the menu if the user has a budget created
+    {
+        Console.WriteLine(@"
+    1 - View Current Budget
+    2 - Input Deposit
+    3 - Input Purchase
+    4 - Edit Budget
+    5 - Create New Budget
+    6 - Exit Program
+    ");
+        Console.WriteLine("What would you like to do?: ");
+        int menuSelection = Convert.ToInt32(Console.ReadLine());
+
+        /*Code for them to choose one of the options above*/
+        switch (menuSelection)
+        {
+            case 1:
+    
+                string[] lines = File.ReadAllLines($"{usernameInput}.txt");
+
+                foreach (string line in lines) //prints the contents of the file
+                {
+                    Console.WriteLine(line);
+                }
+
+                break;
+            case 5:
+                
+                List<(string category, decimal allotment, int spent)> categoryValues = new List<(string category, decimal allotment, int spent)>();
+                
+                while (true)
+                {
+                    Console.Write("Please create a name for your category: ");
+                    categoryName = Console.ReadLine();
+
+                    Console.Write($"How much would you like to spend per paycheck on {categoryName}?: ");
+                    string proposedAllotment = Console.ReadLine();
+                    if (ValidateAllotment(proposedAllotment))
+                    {
+                        categoryAllotment = Convert.ToDecimal(proposedAllotment);
+                        categoryValues.Add((categoryName, categoryAllotment, 0));
+
+                        Console.WriteLine($"\n{categoryName} category created with a ${categoryAllotment} allotment.");
+                        Console.Write("Please press 1 to create another category. Otherwise, press any key to return to menu: ");
+                        string choice = Console.ReadLine();
+                        if (choice != "1")
+                            break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                break;
+            default:
+                Console.WriteLine("Please pick a valid option.\n");
+                break;
+        }
+    }
+    /*TODO - create an else statement that automatically takes user to create a file if they haven't already
+    else
+    {
+
+    }*/
+}
+
+static bool ValidateAllotment(string allotment)
+{
+    try
+    {
+        Convert.ToDecimal(allotment);
+    }
+    catch (FormatException)
+    {
+        Console.WriteLine("Invalid number.\n");
+        return false;
+    }
+    catch (OverflowException)
+    {
+        Console.WriteLine("I'm sorry, that number is too big.\n");
+        return false;
+    }
+    catch (Exception)
+    {
+        Console.WriteLine("Please try again.\n");
+        return false;
+    }
+
+    return true;
+}
