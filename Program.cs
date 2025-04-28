@@ -17,6 +17,11 @@ Debug.Assert(ValidatePin("1234") == true);
 Debug.Assert(ValidatePin("12345") == false, "Password should be 4 numbers");
 Debug.Assert(ValidatePin("g3*4") == false, "Pin cannot contain characters or letters");
 
+//ValidateAllotment tests
+Debug.Assert(ValidateAllotment("123456789.12") == true);
+Debug.Assert(ValidateAllotment("-5") == false, "Cannot propose a negative allotment");
+Debug.Assert(ValidateAllotment("2j0") == false, "Cannot have letters in proposal");
+
 Console.Clear();
 
 int attempts = 3; //tracks login attempts
@@ -235,11 +240,13 @@ while (loggedIn)
     }*/
 }
 
-static bool ValidateAllotment(string allotment)
+static bool ValidateAllotment(string proposedAllotment)
 {
+    decimal allotment = 0;
+
     try
     {
-        Convert.ToDecimal(allotment);
+        allotment = Convert.ToDecimal(proposedAllotment);
     }
     catch (FormatException)
     {
@@ -254,6 +261,12 @@ static bool ValidateAllotment(string allotment)
     catch (Exception)
     {
         Console.WriteLine("Please try again.\n");
+        return false;
+    }
+
+    if (allotment < 0)
+    {
+        Console.WriteLine("Number must be a positive number.");
         return false;
     }
 
