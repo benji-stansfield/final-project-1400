@@ -31,9 +31,9 @@ bool loggedIn = false; //used to log in a user
 bool userFound = false;
 bool usernameValidated = false; //used to validate a username while creating account
 bool pinValidated = false; //used to validate a pin while creating account
-string categoryName = "";
-decimal categoryAllotment = 0;
-decimal spentInCategory = 0;
+string categoryName = ""; //lists the name of the category the user creates
+decimal categoryAllotment = 0; //amount allowed to spend to fit within budget
+decimal spentInCategory = 0; //amount spent in a specific category
 
 Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
@@ -55,7 +55,9 @@ switch (userChoice)
         string[] lines = File.ReadAllLines("users.txt");
 
         while (!loggedIn && attempts > 0)
-        {
+        {   
+            userFound = false;
+
             Console.Write("Username: ");
             usernameInput = Console.ReadLine();
             Console.Write("Pin #: ");
@@ -110,7 +112,7 @@ switch (userChoice)
 
         } while(!pinValidated);
 
-        File.AppendAllText("users.txt", $"\n{usernameInput},{pinInput}");
+        File.AppendAllText("users.txt", $"{usernameInput},{pinInput}\n");
 
         loggedIn = true;
 
@@ -228,6 +230,10 @@ while (loggedIn)
                 }
 
                 break;
+            case 6:
+                Console.WriteLine("Thank you!");
+                loggedIn = false;
+                break;
             default:
                 Console.WriteLine("Please pick a valid option.\n");
                 break;
@@ -240,6 +246,7 @@ while (loggedIn)
     }*/
 }
 
+/*Method makes sure that the proposed allotment for each category is a number*/
 static bool ValidateAllotment(string proposedAllotment)
 {
     decimal allotment = 0;
