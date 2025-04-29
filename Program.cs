@@ -10,6 +10,7 @@ Debug.Assert(ValidateUsername("benji stansfield") == false, "User shouldn't be a
 Debug.Assert(ValidateUsername("14b") == false, "username should be over 4 characters");
 Debug.Assert(ValidateUsername("bms17") == true);
 Debug.Assert(ValidateUsername("bstansfield123456789") == true);
+Debug.Assert(ValidateUsername("bstansfield") == false, "username should already be found");
 
 //ValidatePin tests
 Debug.Assert(ValidatePin("23") == false, "Password should be 4 numbers");
@@ -34,6 +35,7 @@ bool pinValidated = false; //used to validate a pin while creating account
 string categoryName = ""; //lists the name of the category the user creates
 decimal categoryAllotment = 0; //amount allowed to spend to fit within budget
 decimal spentInCategory = 0; //amount spent in a specific category
+int menuSelection = 0;
 
 Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
@@ -52,7 +54,7 @@ switch (userChoice)
 {
     case 1: //choice for them to log in
 
-        string[] lines = File.ReadAllLines("users.txt");
+        string[] usersLines = File.ReadAllLines("users.txt");
 
         while (!loggedIn && attempts > 0)
         {   
@@ -63,7 +65,7 @@ switch (userChoice)
             Console.Write("Pin #: ");
             pinInput = Console.ReadLine();
 
-            foreach(string line in lines)
+            foreach(string line in usersLines)
             {
                 string[] parts = line.Split(',');
 
@@ -105,7 +107,7 @@ switch (userChoice)
 
         do
         {
-            Console.Write("Pin: ");
+            Console.Write("Pin (4 digits): ");
             pinInput = Console.ReadLine();
             if (ValidatePin(pinInput))
                 pinValidated = true;
@@ -143,7 +145,18 @@ static bool ValidateUsername(string input)
         return false;
     }
 
-    //TODO: read users.txt to see if username already exists
+    /*Check to see if the username already exists*/
+    string[] lines = File.ReadAllLines("users.txt");
+    foreach (string line in lines)
+    {
+        string[] parts = line.Split(',');
+        if (parts[0] == input)
+        {
+            Console.WriteLine("Username already exists.\n");
+            return false;
+        }
+    }
+
     
     return true;
 }
@@ -175,18 +188,15 @@ static bool ValidatePin(string input)
 /*Inside the program-menu select*/
 while (loggedIn)
 {
-    if (File.Exists($"{usernameInput}.txt")) //only displays the menu if the user has a budget created
-    {
-        Console.WriteLine(@"
+    Console.WriteLine(@"
     1 - View Current Budget
     2 - Input Deposit
     3 - Input Purchase
-    4 - Edit Budget
-    5 - Create New Budget
-    6 - Exit Program
+    4 - Create New Budget
+    5 - Exit Program
     ");
         Console.WriteLine("What would you like to do?: ");
-        int menuSelection = Convert.ToInt32(Console.ReadLine());
+        menuSelection = Convert.ToInt32(Console.ReadLine());
 
         /*Code for them to choose one of the options above*/
         switch (menuSelection)
@@ -201,7 +211,7 @@ while (loggedIn)
                 }
 
                 break;
-            case 5:
+            case 4:
                 
                 List<(string category, decimal allotment, int spent)> categoryValues = new List<(string category, decimal allotment, int spent)>();
                 
@@ -230,7 +240,7 @@ while (loggedIn)
                 }
 
                 break;
-            case 6:
+            case 5:
                 Console.WriteLine("Thank you!");
                 loggedIn = false;
                 break;
@@ -238,12 +248,6 @@ while (loggedIn)
                 Console.WriteLine("Please pick a valid option.\n");
                 break;
         }
-    }
-    /*TODO - create an else statement that automatically takes user to create a file if they haven't already
-    else
-    {
-
-    }*/
 }
 
 /*Method makes sure that the proposed allotment for each category is a number*/
