@@ -35,7 +35,8 @@ bool pinValidated = false; //used to validate a pin while creating account
 string categoryName = ""; //lists the name of the category the user creates
 decimal categoryAllotment; //amount allowed to spend to fit within budget
 decimal spentInCategory; //amount spent in a specific category
-decimal paycheckAmount;
+decimal paycheckAmount = 0;
+decimal currentBalance = 0;
 
 Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
@@ -74,7 +75,7 @@ switch (userChoice)
 
                 if (usernameInput == username && pinInput == pin)
                 {   
-                    Console.Write("Sign in successful");
+                    Console.Write("Sign in successful!\n");
                     userFound = true;
                     loggedIn = true;
                     break;
@@ -189,10 +190,21 @@ static bool ValidatePin(string input)
 /*Inside the program-menu select*/
 while (loggedIn)
 {
+    if (paycheckAmount == 0) //only asks this question if the user has not input a paycheck amount already
+            {
+                Console.Write("How much are your paychecks?: ");
+                string paycheckString = Console.ReadLine();
+                if (ValidateAllotment(paycheckString))
+                {
+                    paycheckAmount = Convert.ToDecimal(paycheckString);
+                    File.AppendAllText($"{usernameInput}.txt",$"Paycheck amount: ${paycheckAmount}.\n"); //adds paycheck amount to file
+                }
+            }
+
     Console.WriteLine(@"
     1 - View Current Budget
     2 - Input Deposit
-    3 - Input Purchase
+    3 - Record Purchase
     4 - Create New Budget
     5 - Exit Program
     ");
@@ -211,18 +223,24 @@ while (loggedIn)
                 Console.WriteLine(line);
             }
 
+            Console.Write("Press any key to return to menu.\n");
+            Console.ReadKey(true);
+
+            break;
+
+        case 2:
+
+            currentBalance += paycheckAmount;
+            Console.WriteLine($"Your current budgeting balance is ${currentBalance}.\n");
+
+            Console.Write("Press any key to return to menu.\n");
+            Console.ReadKey(true);
+
             break;
 
         case 4:
                 
             List<(string category, decimal allotment, decimal spent)> categoryValues = new List<(string category, decimal allotment, Decimal spent)>();
-            Console.Write("How much are your paychecks?: ");
-            string paycheckString = Console.ReadLine();
-            if (ValidateAllotment(paycheckString))
-            {
-                paycheckAmount = Convert.ToDecimal(paycheckString);
-            }
-            else {continue;}
 
             while (true)
             {
@@ -234,11 +252,9 @@ while (loggedIn)
                 if (ValidateAllotment(proposedAllotment))
                 {
                     categoryAllotment = Convert.ToDecimal(proposedAllotment);
-                    categoryValues.Add((categoryName, categoryAllotment, 0));
-                    foreach (var item in categoryValues)
-                    {
-                        File.WriteAllText($"{usernameInput}.txt", $"{item.category},{item.allotment},{item.spent}\n");
-                    }
+                    var newItem = (categoryName, categoryAllotment, 0); //creates new item so it only adds the last item instead of overwriting file
+                    categoryValues.Add(newItem);
+                    File.AppendAllText($"{usernameInput}.txt", $"{newItem.categoryName},{newItem.categoryAllotment},{0}\n");
 
                     Console.WriteLine($"\n{categoryName} category created with a ${categoryAllotment} allotment.");
                     Console.Write("Please press 1 to create another category. Otherwise, press any key to return to menu: ");
@@ -249,6 +265,9 @@ while (loggedIn)
                 }
                 else{continue;}
             }
+
+            Console.Write("Press any key to return to menu.\n");
+            Console.ReadKey(true);
 
             break;
 
