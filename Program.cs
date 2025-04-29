@@ -29,13 +29,13 @@ int attempts = 3; //tracks login attempts
 string usernameInput = "";
 string pinInput = "";
 bool loggedIn = false; //used to log in a user
-bool userFound = false;
+bool userFound;
 bool usernameValidated = false; //used to validate a username while creating account
 bool pinValidated = false; //used to validate a pin while creating account
 string categoryName = ""; //lists the name of the category the user creates
-decimal categoryAllotment = 0; //amount allowed to spend to fit within budget
-decimal spentInCategory = 0; //amount spent in a specific category
-int menuSelection = 0;
+decimal categoryAllotment; //amount allowed to spend to fit within budget
+decimal spentInCategory; //amount spent in a specific category
+decimal paycheckAmount;
 
 Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
@@ -121,6 +121,7 @@ switch (userChoice)
         break;
         
     default:
+
         Console.WriteLine("Please select an option above.");
         break;
 }
@@ -195,59 +196,73 @@ while (loggedIn)
     4 - Create New Budget
     5 - Exit Program
     ");
-        Console.WriteLine("What would you like to do?: ");
-        menuSelection = Convert.ToInt32(Console.ReadLine());
+    Console.WriteLine("What would you like to do?: ");
+    int menuSelection = Convert.ToInt32(Console.ReadLine());
 
-        /*Code for them to choose one of the options above*/
-        switch (menuSelection)
-        {
-            case 1:
+    /*Code for them to choose one of the options above*/
+    switch (menuSelection)
+    {
+        case 1:
     
-                string[] lines = File.ReadAllLines($"{usernameInput}.txt");
+            string[] lines = File.ReadAllLines($"{usernameInput}.txt");
 
-                foreach (string line in lines) //prints the contents of the file
-                {
-                    Console.WriteLine(line);
-                }
+            foreach (string line in lines) //prints the contents of the file
+            {
+                Console.WriteLine(line);
+            }
 
-                break;
-            case 4:
+            break;
+
+        case 4:
                 
-                List<(string category, decimal allotment, int spent)> categoryValues = new List<(string category, decimal allotment, int spent)>();
-                
-                while (true)
+            List<(string category, decimal allotment, decimal spent)> categoryValues = new List<(string category, decimal allotment, Decimal spent)>();
+            Console.Write("How much are your paychecks?: ");
+            string paycheckString = Console.ReadLine();
+            if (ValidateAllotment(paycheckString))
+            {
+                paycheckAmount = Convert.ToDecimal(paycheckString);
+            }
+            else {continue;}
+
+            while (true)
+            {
+                Console.Write("Please create a name for your category: ");
+                categoryName = Console.ReadLine();
+
+                Console.Write($"How much would you like to spend per paycheck on {categoryName}?: ");
+                string proposedAllotment = Console.ReadLine();
+                if (ValidateAllotment(proposedAllotment))
                 {
-                    Console.Write("Please create a name for your category: ");
-                    categoryName = Console.ReadLine();
-
-                    Console.Write($"How much would you like to spend per paycheck on {categoryName}?: ");
-                    string proposedAllotment = Console.ReadLine();
-                    if (ValidateAllotment(proposedAllotment))
+                    categoryAllotment = Convert.ToDecimal(proposedAllotment);
+                    categoryValues.Add((categoryName, categoryAllotment, 0));
+                    foreach (var item in categoryValues)
                     {
-                        categoryAllotment = Convert.ToDecimal(proposedAllotment);
-                        categoryValues.Add((categoryName, categoryAllotment, 0));
+                        File.WriteAllText($"{usernameInput}.txt", $"{item.category},{item.allotment},{item.spent}\n");
+                    }
 
-                        Console.WriteLine($"\n{categoryName} category created with a ${categoryAllotment} allotment.");
-                        Console.Write("Please press 1 to create another category. Otherwise, press any key to return to menu: ");
-                        string choice = Console.ReadLine();
-                        if (choice != "1")
-                            break;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    Console.WriteLine($"\n{categoryName} category created with a ${categoryAllotment} allotment.");
+                    Console.Write("Please press 1 to create another category. Otherwise, press any key to return to menu: ");
+
+                    string choice = Console.ReadLine();
+                    if (choice != "1")
+                        break;
                 }
+                else{continue;}
+            }
 
-                break;
-            case 5:
-                Console.WriteLine("Thank you!");
-                loggedIn = false;
-                break;
-            default:
-                Console.WriteLine("Please pick a valid option.\n");
-                break;
-        }
+            break;
+
+        case 5:
+
+            Console.WriteLine("Thank you!");
+            loggedIn = false;
+            break;
+
+        default:
+
+            Console.WriteLine("Please pick a valid option.\n");
+            break;
+    }
 }
 
 /*Method makes sure that the proposed allotment for each category is a number*/
