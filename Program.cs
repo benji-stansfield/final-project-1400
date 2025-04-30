@@ -37,6 +37,7 @@ decimal categoryAllotment; //amount allowed to spend to fit within budget
 decimal spentInCategory; //amount spent in a specific category
 decimal paycheckAmount = 0;
 decimal currentBalance = 0;
+decimal budgetAllotmentRemaining = 0;
 
 Console.WriteLine(@"------------------------
  WELCOME TO YOUR BUDGET
@@ -207,15 +208,17 @@ static bool ValidatePin(string input)
 while (loggedIn)
 {
     if (paycheckAmount == 0) //only asks this question if the user has not input a paycheck amount already
-            {
-                Console.Write("How much are your paychecks?: ");
-                string paycheckString = Console.ReadLine();
-                if (ValidateAllotment(paycheckString))
-                {
-                    paycheckAmount = Convert.ToDecimal(paycheckString);
-                    File.AppendAllText($"{usernameInput}.txt",$"Paycheck amount: ${paycheckAmount}\n"); //adds paycheck amount to file
-                }
-            }
+    {
+        Console.Write("How much are your paychecks?: ");
+        string paycheckString = Console.ReadLine();
+        if (ValidateAllotment(paycheckString))
+        {
+            paycheckAmount = Convert.ToDecimal(paycheckString);
+            File.AppendAllText($"{usernameInput}.txt",$"Paycheck amount: ${paycheckAmount}\n"); //adds paycheck amount to file
+
+            currentBalance += paycheckAmount;
+        }
+    }
 
     Console.WriteLine(@"
     1 - View Current Budget
@@ -343,26 +346,27 @@ while (loggedIn)
         case 4:
                 
             List<(string category, decimal allotment, decimal spent)> categoryValues = new List<(string category, decimal allotment, Decimal spent)>();
+            var finalLine = $"Budget Allotment Left/Current Balance:,{budgetAllotmentRemaining},{currentBalance}\n";
+            File.AppendAllText($"{usernameInput}.txt", finalLine); //get it to write the last line into the file
 
             while (true)
-            {
+            {   
                 Console.Write("Please create a name for your category: ");
                 categoryName = Console.ReadLine();
-
                 Console.Write($"How much would you like to spend per paycheck on {categoryName}?: ");
                 string proposedAllotment = Console.ReadLine();
                 if (ValidateAllotment(proposedAllotment))
                 {
                     categoryAllotment = Convert.ToDecimal(proposedAllotment);
                     var newItem = (categoryName, categoryAllotment, 0); //creates new item so it only adds the last item instead of overwriting file
-                    categoryValues.Add(newItem);
+                    categoryValues.Add(newItem); //places each category above the final written line
                     File.AppendAllText($"{usernameInput}.txt", $"\n{newItem.categoryName},{newItem.categoryAllotment},{0}\n");
 
                     Console.WriteLine($"\n{categoryName} category created with a ${categoryAllotment} allotment.");
-                    Console.Write("Please press 1 to create another category. Otherwise, press any key to return to menu: ");
+                    Console.Write("Press 1 to go back to the main menu, otherwise, press any key to add another category.");
 
                     string choice = Console.ReadLine();
-                    if (choice != "1")
+                    if (choice == "1")
                         break;
                 }
                 else{continue;}
