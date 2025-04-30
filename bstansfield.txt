@@ -1,0 +1,10 @@
+Paycheck amount: $800
+Budget Allotment Left/Current Balance:,0,800
+
+Tithing,85,85
+
+Car payment,150,0
+
+Gas,160,0
+
+Groceries,150,0

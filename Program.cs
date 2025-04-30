@@ -33,7 +33,7 @@ bool userFound;
 bool usernameValidated = false; //used to validate a username while creating account
 bool pinValidated = false; //used to validate a pin while creating account
 string categoryName = ""; //lists the name of the category the user creates
-decimal categoryAllotment; //amount allowed to spend to fit within budget
+decimal categoryAllotment = 0; //amount allowed to spend to fit within budget
 decimal spentInCategory; //amount spent in a specific category
 decimal paycheckAmount = 0;
 decimal currentBalance = 0;
@@ -85,12 +85,23 @@ switch (userChoice)
                     {
                         string[] userFileLines = File.ReadAllLines($"{usernameInput}.txt");
                         foreach (string fileLine in userFileLines)
-                        {
+                        {   
+                            /*Saves the paycheck amount*/
                             if (fileLine.StartsWith("Paycheck amount: $")) //looks for the line in the file that mentions the paycheck amount
                             {
                                 string paycheckString = fileLine.Replace("Paycheck amount: $", "").Trim(); //isolates line until its only the number
                                 paycheckAmount = Convert.ToDecimal(paycheckString);
-                                break;
+                            }
+                            /*saves the budget allotment remaining*/
+                            else
+                            {
+                                string[] categoryParts = fileLine.Split(',');
+
+                                if (categoryParts.Length != 3) //doesn't account for the first line
+                                    continue;
+
+                                decimal allotment = Convert.ToDecimal(categoryParts[1]);
+                                decimal spent = Convert.ToDecimal(categoryParts[2]);
                             }
                         }
                     }
@@ -217,6 +228,7 @@ while (loggedIn)
             File.AppendAllText($"{usernameInput}.txt",$"Paycheck amount: ${paycheckAmount}\n"); //adds paycheck amount to file
 
             currentBalance += paycheckAmount;
+            budgetAllotmentRemaining = currentBalance;
         }
     }
 
@@ -250,6 +262,7 @@ while (loggedIn)
         case 2:
 
             currentBalance += paycheckAmount;
+            budgetAllotmentRemaining = currentBalance;
             Console.WriteLine($"Your current budgeting balance is ${currentBalance}.\n");
 
             Console.Write("Press any key to return to menu.\n");
@@ -258,6 +271,8 @@ while (loggedIn)
             break;
 
         case 3:
+
+            Console.Clear();
     
             List<string> updatedLines = new List<string>();
             string[] allLines = File.ReadAllLines($"{usernameInput}.txt");
@@ -310,6 +325,12 @@ while (loggedIn)
                 break;
             }
 
+            if (purchaseAmount > categoryAllotment)
+            {
+                Console.WriteLine("You are going over your allotment for this category.");
+                break;
+            }
+
             currentBalance -= purchaseAmount;
             selectedCategory.spent += purchaseAmount;
 
@@ -342,12 +363,9 @@ while (loggedIn)
 
             break;
 
-
         case 4:
                 
             List<(string category, decimal allotment, decimal spent)> categoryValues = new List<(string category, decimal allotment, Decimal spent)>();
-            var finalLine = $"Budget Allotment Left/Current Balance:,{budgetAllotmentRemaining},{currentBalance}\n";
-            File.AppendAllText($"{usernameInput}.txt", finalLine); //get it to write the last line into the file
 
             while (true)
             {   
@@ -355,9 +373,13 @@ while (loggedIn)
                 categoryName = Console.ReadLine();
                 Console.Write($"How much would you like to spend per paycheck on {categoryName}?: ");
                 string proposedAllotment = Console.ReadLine();
+
                 if (ValidateAllotment(proposedAllotment))
-                {
+                {   
                     categoryAllotment = Convert.ToDecimal(proposedAllotment);
+                    budgetAllotmentRemaining -= categoryAllotment;
+
+                    /*Update the file*/
                     var newItem = (categoryName, categoryAllotment, 0); //creates new item so it only adds the last item instead of overwriting file
                     categoryValues.Add(newItem); //places each category above the final written line
                     File.AppendAllText($"{usernameInput}.txt", $"\n{newItem.categoryName},{newItem.categoryAllotment},{0}\n");
@@ -368,12 +390,13 @@ while (loggedIn)
                     string choice = Console.ReadLine();
                     if (choice == "1")
                         break;
+                    Console.Clear();
                 }
                 else{continue;}
             }
 
-            Console.Write("Press any key to return to menu.\n");
-            Console.ReadKey(true);
+            var balanceLine = $"Budget Allotment Left/Current Balance:,{budgetAllotmentRemaining},{currentBalance}\n";
+            File.AppendAllText($"{usernameInput}.txt", balanceLine);
 
             break;
 

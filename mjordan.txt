@@ -1,0 +1,11 @@
+
+Paycheck amount: $10000
+
+Car payment,1000,0
+
+Mortgage,5000,0
+
+Gas,1000,0
+
+Food,5000,0
+Budget Allotment Left/Current Balance:,-2000,10000
