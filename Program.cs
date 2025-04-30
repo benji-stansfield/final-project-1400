@@ -76,8 +76,24 @@ switch (userChoice)
                 if (usernameInput == username && pinInput == pin)
                 {   
                     Console.Write("Sign in successful!\n");
+
                     userFound = true;
                     loggedIn = true;
+
+                    if (File.Exists($"{usernameInput}.txt"))
+                    {
+                        string[] userFileLines = File.ReadAllLines($"{usernameInput}.txt");
+                        foreach (string fileLine in userFileLines)
+                        {
+                            if (fileLine.StartsWith("Paycheck amount: $")) //looks for the line in the file that mentions the paycheck amount
+                            {
+                                string paycheckString = fileLine.Replace("Paycheck amount: $", "").Trim(); //isolates line until its only the number
+                                paycheckAmount = Convert.ToDecimal(paycheckString);
+                                break;
+                            }
+                        }
+                    }
+
                     break;
                 }
             }
@@ -197,7 +213,7 @@ while (loggedIn)
                 if (ValidateAllotment(paycheckString))
                 {
                     paycheckAmount = Convert.ToDecimal(paycheckString);
-                    File.AppendAllText($"{usernameInput}.txt",$"Paycheck amount: ${paycheckAmount}.\n"); //adds paycheck amount to file
+                    File.AppendAllText($"{usernameInput}.txt",$"Paycheck amount: ${paycheckAmount}\n"); //adds paycheck amount to file
                 }
             }
 
