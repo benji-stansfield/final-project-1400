@@ -225,7 +225,7 @@ while (loggedIn)
     5 - Exit Program
     ");
     Console.WriteLine("What would you like to do?: ");
-    int menuSelection = Convert.ToInt32(Console.ReadLine());
+    int menuSelection = Convert.ToInt32(Console.ReadLine() + "\n");
 
     /*Code for them to choose one of the options above*/
     switch (menuSelection)
@@ -254,6 +254,92 @@ while (loggedIn)
 
             break;
 
+        case 3:
+    
+            List<string> updatedLines = new List<string>();
+            string[] allLines = File.ReadAllLines($"{usernameInput}.txt");
+
+            /*Display available categories*/
+            Console.WriteLine("Categories:");
+            int index = 1;
+            List<(string category, decimal allotment, decimal spent)> categories = new List<(string, decimal, decimal)>();
+
+            foreach (string line in allLines)
+            {
+                if (line.StartsWith("Paycheck amount")) //skips paycheck line
+                    continue;
+                if (line.StartsWith("Current balance")) //skips balance line
+                    continue;
+
+                string[] parts = line.Split(',');
+                if (parts.Length == 3)
+                {
+                    string name = parts[0];
+                    decimal allot = Convert.ToDecimal(parts[1]);
+                    decimal spent = Convert.ToDecimal(parts[2]);
+
+                    categories.Add((name, allot, spent));
+                    Console.WriteLine($"{index} - {name} (Allotted: ${allot}, Spent: ${spent})");
+                    index++;
+                }
+            }
+
+            Console.Write("Select a category number: ");
+            int categoryChoice = Convert.ToInt32(Console.ReadLine()) - 1;
+            if (categoryChoice < 0 || categoryChoice >= categories.Count) //choice must be 1-how many items in the list there are
+            {
+                Console.WriteLine("Invalid category selected.");
+                break;
+            }
+
+            var selectedCategory = categories[categoryChoice];
+
+            Console.Write($"Enter purchase amount for {selectedCategory.category}: $");
+            string purchaseInput = Console.ReadLine();
+            if (!ValidateAllotment(purchaseInput)) 
+                break;
+
+            decimal purchaseAmount = Convert.ToDecimal(purchaseInput);
+
+            if (purchaseAmount > currentBalance)
+            {
+                Console.WriteLine("Insufficient funds in your current balance.");
+                break;
+            }
+
+            currentBalance -= purchaseAmount;
+            selectedCategory.spent += purchaseAmount;
+
+            /*Update the file*/
+            foreach (string line in allLines)
+            {
+                if (line.StartsWith("Paycheck amount"))
+                {
+                    updatedLines.Add(line); //Leave paycheck line as is
+                }
+                else
+                {
+                    string[] parts = line.Split(',');
+                    if (parts[0] == selectedCategory.category)
+                    {
+                        updatedLines.Add($"{selectedCategory.category},{selectedCategory.allotment},{selectedCategory.spent}"); //updates spent (0) to number user put
+                    }
+                    else
+                    {
+                        updatedLines.Add(line);
+                    }
+                }
+            }
+
+            File.WriteAllLines($"{usernameInput}.txt", updatedLines.ToArray());
+
+            Console.WriteLine($"\nPurchase recorded! Remaining balance: ${currentBalance}");
+            Console.Write("Press any key to return to menu.");
+            Console.ReadKey(true);
+
+            break;
+
+
         case 4:
                 
             List<(string category, decimal allotment, decimal spent)> categoryValues = new List<(string category, decimal allotment, Decimal spent)>();
@@ -270,7 +356,7 @@ while (loggedIn)
                     categoryAllotment = Convert.ToDecimal(proposedAllotment);
                     var newItem = (categoryName, categoryAllotment, 0); //creates new item so it only adds the last item instead of overwriting file
                     categoryValues.Add(newItem);
-                    File.AppendAllText($"{usernameInput}.txt", $"{newItem.categoryName},{newItem.categoryAllotment},{0}\n");
+                    File.AppendAllText($"{usernameInput}.txt", $"\n{newItem.categoryName},{newItem.categoryAllotment},{0}\n");
 
                     Console.WriteLine($"\n{categoryName} category created with a ${categoryAllotment} allotment.");
                     Console.Write("Please press 1 to create another category. Otherwise, press any key to return to menu: ");

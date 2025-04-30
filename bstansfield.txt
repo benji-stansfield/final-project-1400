@@ -1,1 +1,9 @@
 Paycheck amount: $800
+
+Tithing,85,0
+
+Car payment,150,0
+
+Gas,160,0
+
+Groceries,150,0
